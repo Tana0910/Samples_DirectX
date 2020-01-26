@@ -49,7 +49,11 @@ namespace DXGraphicAPI
 
 		// 定数バッファ
 		CComPtr<ID3D11Buffer> matrixbuffer;
+
+		
 		CComPtr<ID3D11Buffer> vertexbuffer;
+		CComPtr<ID3D11Buffer> indexbuffer;
+
 		UINT numindices = 0;
 
 		// DirectX算術用マトリックス
@@ -63,11 +67,23 @@ namespace DXGraphicAPI
 			float color[4];     // (r, g, b, a)
 		};
 
+		struct Triangle
+		{
+			int indices[3];
+		};
+
 		std::vector<Vertex> InputData =
 		{
-			{{ 0.0f, 0.0f, 1.732051f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-			{{-1.0f, 0.0f,   0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-			{{ 1.0f, 0.0f,   0.0f}, {0.0f, 0.0f, 1.0f, 1.0f}}
+			{{-1.0f, 0.0f, 2.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+			{{-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+			{{ 1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+			{{ 1.0f, 0.0f, 2.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}
+		};
+
+		std::vector<Triangle> InputTriangle =
+		{
+			{{0, 1, 3}},
+			{{1, 2, 3}}
 		};
 
 		struct CoordColor

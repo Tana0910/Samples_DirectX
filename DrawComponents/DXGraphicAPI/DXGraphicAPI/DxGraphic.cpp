@@ -321,7 +321,8 @@ void DXGraphicAPI::CDxGraphic::Render()
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context->IASetVertexBuffers(0, 1, &vertexbuffer.p, &strides, &offset);
-	context->Draw(numindices, 0);
+	context->IASetIndexBuffer(indexbuffer, DXGI_FORMAT_R32_UINT, 0);
+	context->DrawIndexed(numindices, 0, 0);
 
 	// 作成したプリミティブをウィンドウへ描画
 	if (swapchain != nullptr)
@@ -354,7 +355,15 @@ void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 		vertexarray.push_back(v.color[3]);
 	}
 
-	numindices = static_cast<UINT>(vertexarray.size()) / 7;
+
+	std::vector<int> indexarray;
+	for (Triangle tri : InputTriangle)
+	{
+		indexarray.push_back(tri.indices[0]);
+		indexarray.push_back(tri.indices[1]);
+		indexarray.push_back(tri.indices[2]);
+	}
+	numindices = static_cast<UINT>(indexarray.size());
 
 	vertexbuffer.Release();
 	D3D11_BUFFER_DESC bdvertex =
@@ -365,6 +374,16 @@ void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 	};
 	D3D11_SUBRESOURCE_DATA srdv = { &vertexarray.front() };
 	device->CreateBuffer(&bdvertex, &srdv, &vertexbuffer.p);
+
+	indexbuffer.Release();
+	D3D11_BUFFER_DESC bdindex =
+	{
+		static_cast<UINT>(sizeof(int) * indexarray.size()),
+		D3D11_USAGE_DEFAULT,
+		D3D11_BIND_INDEX_BUFFER
+	};
+	D3D11_SUBRESOURCE_DATA srdind = { &indexarray.front() };
+	device->CreateBuffer(&bdindex, &srdind, &indexbuffer.p);
 
 	Render();
 }

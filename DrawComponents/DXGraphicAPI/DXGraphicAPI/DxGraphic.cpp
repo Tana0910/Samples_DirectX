@@ -336,9 +336,15 @@ void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 
 	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(M_PI / 4.0f, 1.0f * w / h, nearz, farz);
 
-	DirectX::XMVECTOR eye = DirectX::XMVectorSet(3.5f, 3.5f, 3.5f, 0.0f);
-	DirectX::XMVECTOR focus = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	m_cameraposition = Math::Vector3(3.5f, 3.5f, 3.5f);
+	m_lookatpoint = Math::Vector3(0.0f, 0.0f, 0.0f);
+	m_camupset = true;
+
+	float upsetz = m_camupset ? 1.0f : -1.0f;
+
+	DirectX::XMVECTOR eye = DirectX::XMVectorSet(m_cameraposition.x, m_cameraposition.y, m_cameraposition.z, 0.0f);
+	DirectX::XMVECTOR focus = DirectX::XMVectorSet(m_lookatpoint.x, m_lookatpoint.y, m_lookatpoint.z, 0.0f);
+	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, upsetz, 0.0f);
 
 	d3dviewmatrix = DirectX::XMMatrixLookAtRH(eye, focus, up);
 

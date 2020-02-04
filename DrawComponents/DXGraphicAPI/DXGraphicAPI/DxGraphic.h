@@ -17,6 +17,10 @@
 
 // Comptr
 #include <atlcomcli.h>
+
+// Core Math Part
+#include "Math\\Vector.h"
+
 extern HINSTANCE g_hInstance;
 
 namespace DXGraphicAPI
@@ -60,6 +64,13 @@ namespace DXGraphicAPI
 		DirectX::XMMATRIX d3dworldmatrix = DirectX::XMMatrixIdentity();
 		DirectX::XMMATRIX d3dviewmatrix = DirectX::XMMatrixIdentity();
 		DirectX::XMMATRIX d3dprojmatrix = DirectX::XMMatrixIdentity();
+
+		// カメラ位置, 注視点
+		Math::Vector3 m_cameraposition;
+		Math::Vector3 m_lookatpoint;
+
+		// カメラの上方向 true: +z, false: -z 
+		bool m_camupset;
 
 		struct Vertex
 		{

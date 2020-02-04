@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.29519.161
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXGraphicAPI", "DXGraphicAPI\DXGraphicAPI.vcxproj", "{61117CB7-31BC-48A4-8557-7F2B96C4B0AF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxitems", "{16ED42A1-D8B8-4573-BB17-7CA63CD41975}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Core\Core.vcxitems*{16ed42a1-d8b8-4573-bb17-7ca63cd41975}*SharedItemsImports = 9
+		Core\Core.vcxitems*{61117cb7-31bc-48a4-8557-7f2b96c4b0af}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64

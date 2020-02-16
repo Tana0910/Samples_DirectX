@@ -338,9 +338,8 @@ void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 
 	m_cameraposition = Math::Vector3(3.5f, 3.5f, 3.5f);
 	m_lookatpoint = Math::Vector3(0.0f, 0.0f, 0.0f);
-	m_camupset = true;
 
-	float upsetz = m_camupset ? 1.0f : -1.0f;
+	float upsetz = m_camupset ? -1.0f : 1.0f;
 
 	DirectX::XMVECTOR eye = DirectX::XMVectorSet(m_cameraposition.x, m_cameraposition.y, m_cameraposition.z, 0.0f);
 	DirectX::XMVECTOR focus = DirectX::XMVectorSet(m_lookatpoint.x, m_lookatpoint.y, m_lookatpoint.z, 0.0f);

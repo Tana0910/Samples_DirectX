@@ -66,11 +66,11 @@ namespace DXGraphicAPI
 		DirectX::XMMATRIX d3dprojmatrix = DirectX::XMMatrixIdentity();
 
 		// カメラ位置, 注視点
-		Math::Vector3 m_cameraposition;
-		Math::Vector3 m_lookatpoint;
+		Math::Vector3 m_cameraposition = Math::Vector3();
+		Math::Vector3 m_lookatpoint = Math::Vector3();
 
-		// カメラの上方向 true: +z, false: -z 
-		bool m_camupset;
+		// カメラの上方向を反転させるフラグ
+		bool m_camupset = false;
 
 		struct Vertex
 		{

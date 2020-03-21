@@ -28,3 +28,9 @@ bool ResizeView(int w, int h)
 	}
 	return false;
 }
+
+void RotateZ(float delta)
+{
+	g_dxgra.CameraRotateZ(delta);
+	g_dxgra.Render();
+}

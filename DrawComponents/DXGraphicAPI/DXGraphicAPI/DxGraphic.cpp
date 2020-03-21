@@ -443,3 +443,17 @@ bool DXGraphicAPI::CDxGraphic::ResizeView(int w, int h)
 
 	return true;
 }
+
+void DXGraphicAPI::CDxGraphic::CameraRotateZ(float delta)
+{
+	DirectX::XMMATRIX rotZ = DirectX::XMMatrixRotationZ(delta);
+	DirectX::XMVECTOR eye = DirectX::XMVectorSet(m_cameraposition.x, m_cameraposition.y, m_cameraposition.z, 0.0f);
+
+	eye = DirectX::XMVector3Transform(eye, rotZ);
+	m_cameraposition = Math::Vector3(DirectX::XMVectorGetX(eye), DirectX::XMVectorGetY(eye), DirectX::XMVectorGetZ(eye));
+	float upsetz = m_camupset ? -1.0f : 1.0f;
+	DirectX::XMVECTOR focus = DirectX::XMVectorSet(m_lookatpoint.x, m_lookatpoint.y, m_lookatpoint.z, 0.0f);
+	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, upsetz, 0.0f);
+
+	d3dviewmatrix = DirectX::XMMatrixLookAtRH(eye, focus, up);
+}

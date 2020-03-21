@@ -11,3 +11,5 @@ DLLAPI void SetWindowHandle(HWND hWnd);
 DLLAPI void DrawSampleData(int w, int h);
 
 DLLAPI bool ResizeView(int w, int h);
+
+DLLAPI void RotateZ(float delta);

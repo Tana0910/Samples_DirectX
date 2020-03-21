@@ -14,6 +14,7 @@
 HINSTANCE hInst;                                // 現在のインターフェイス
 WCHAR szTitle[MAX_LOADSTRING];                  // タイトル バーのテキスト
 WCHAR szWindowClass[MAX_LOADSTRING];            // メイン ウィンドウ クラス名
+bool g_dxInitialized = false;
 
 // このコード モジュールに含まれる関数の宣言を転送します:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -53,6 +54,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+        }
+
+        // test
+        if (g_dxInitialized)
+        {
+            RotateZ(-(3.14159265f) / 180.0f);
         }
     }
 
@@ -118,7 +125,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    int w = rc.right - rc.left;
    int h = rc.bottom - rc.top;
    DrawSampleData(w, h);
-
+   g_dxInitialized = true;
    return TRUE;
 }
 
@@ -138,6 +145,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     GetWindowRect(hWnd, &rc);
     int w = rc.right - rc.left;
     int h = rc.bottom - rc.top;
+
     switch (message)
     {
     case WM_SIZE:

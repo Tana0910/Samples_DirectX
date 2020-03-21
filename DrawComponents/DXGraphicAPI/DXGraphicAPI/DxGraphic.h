@@ -155,5 +155,7 @@ namespace DXGraphicAPI
 		void UpdateMatrices(int w, int h);
 
 		bool ResizeView(int w, int h);
+
+		void CameraRotateZ(float delta);
 	};
 }

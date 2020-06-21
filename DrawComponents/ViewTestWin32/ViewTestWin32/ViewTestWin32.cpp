@@ -56,11 +56,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
 
-        // test
-        if (g_dxInitialized)
-        {
-            RotateZ(-(3.14159265f) / 180.0f);
-        }
     }
 
     return (int) msg.wParam;
@@ -150,6 +145,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_SIZE:
         ResizeView(w, h);
+        break;
+    case WM_MOUSEMOVE:
+        if (g_dxInitialized)
+        {
+            RotateZ(-(3.14159265f) / 180.0f);
+        }
         break;
     case WM_COMMAND:
         {

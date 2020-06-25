@@ -1,0 +1,3 @@
+[submodule "External/DirectXTex"]
+	path = External/DirectXTex
+	url = https://github.com/Tana0910/DirectXTex.git

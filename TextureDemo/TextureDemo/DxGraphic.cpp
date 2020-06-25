@@ -1,16 +1,15 @@
 #pragma once
 #include "DxGraphic.h"
 
-CDxGraphic::CDxGraphic()
+DXGraphicAPI::CDxGraphic::CDxGraphic()
 {
 }
 
-
-CDxGraphic::~CDxGraphic()
+DXGraphicAPI::CDxGraphic::~CDxGraphic()
 {
 }
 
-bool CDxGraphic::CreateDeviceAndSwapChain(int w, int h)
+bool DXGraphicAPI::CDxGraphic::CreateDeviceAndSwapChain(int w, int h)
 {
 	DXGI_SWAP_CHAIN_DESC desc = {
 		{ static_cast<UINT>(w), static_cast<UINT>(h),{ 60, 1 },
@@ -42,7 +41,7 @@ bool CDxGraphic::CreateDeviceAndSwapChain(int w, int h)
 	return true;
 }
 
-bool CDxGraphic::CreateRenderTarget()
+bool DXGraphicAPI::CDxGraphic::CreateRenderTarget()
 {
 	if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer)))
 		return false;
@@ -53,11 +52,11 @@ bool CDxGraphic::CreateRenderTarget()
 	return true;
 }
 
-bool CDxGraphic::CreateDefaultRasterizerState()
+bool DXGraphicAPI::CDxGraphic::CreateDefaultRasterizerState()
 {
 	D3D11_RASTERIZER_DESC desc =
 	{
-		D3D11_FILL_SOLID, D3D11_CULL_BACK, TRUE, 0,	0.0f, 0.0f,
+		D3D11_FILL_SOLID, D3D11_CULL_NONE, TRUE, 0,	0.0f, 0.0f,
 		TRUE, FALSE, FALSE, FALSE
 	};
 	if (FAILED(device->CreateRasterizerState(&desc, &rs))) return false;
@@ -65,7 +64,7 @@ bool CDxGraphic::CreateDefaultRasterizerState()
 	return true;
 }
 
-bool CDxGraphic::CreateDepthStencilState()
+bool DXGraphicAPI::CDxGraphic::CreateDepthStencilState()
 {
 	D3D11_DEPTH_STENCIL_DESC desc =
 	{
@@ -79,7 +78,7 @@ bool CDxGraphic::CreateDepthStencilState()
 	return true;
 }
 
-bool CDxGraphic::CreateStencilBuffer(int w, int h)
+bool DXGraphicAPI::CDxGraphic::CreateStencilBuffer(int w, int h)
 {
 
 	D3D11_TEXTURE2D_DESC texdesc =
@@ -101,7 +100,7 @@ bool CDxGraphic::CreateStencilBuffer(int w, int h)
 	return true;
 }
 
-bool CDxGraphic::CreateShaderFromCompiledFiles()
+bool DXGraphicAPI::CDxGraphic::CreateShaderFromCompiledFiles()
 {
 	auto WideStr2MultiByte = [](const std::wstring wstr) -> std::string
 	{
@@ -137,7 +136,7 @@ bool CDxGraphic::CreateShaderFromCompiledFiles()
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT , 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	UINT num = ARRAYSIZE(layout);
 
@@ -180,7 +179,7 @@ bool CDxGraphic::CreateShaderFromCompiledFiles()
 	return true;
 }
 
-bool CDxGraphic::CreateConstantBuffer()
+bool DXGraphicAPI::CDxGraphic::CreateConstantBuffer()
 {
 	// TODO : Create CB
 	D3D11_BUFFER_DESC matrixdesc =
@@ -196,7 +195,31 @@ bool CDxGraphic::CreateConstantBuffer()
 	return true;
 }
 
-void CDxGraphic::ReleaseComPtr()
+bool DXGraphicAPI::CDxGraphic::CreateTextureResource()
+{
+	if (FAILED(DirectX::CreateDDSTextureFromFile(device.p, L"..\\TextureDemo\\Texture\\sample.DDS", &m_pTexrure.p, &m_pTextureView.p)))
+		return false;
+
+	D3D11_SAMPLER_DESC smpDesc =
+	{
+		D3D11_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D11_TEXTURE_ADDRESS_WRAP,
+		D3D11_TEXTURE_ADDRESS_WRAP,
+		D3D11_TEXTURE_ADDRESS_WRAP,
+		0.0f,
+		1,
+		D3D11_COMPARISON_NEVER,
+		{1.0f, 1.0f, 1.0f, 1.0f},
+		0.0f,
+		D3D11_FLOAT32_MAX
+	};
+	if (FAILED(device->CreateSamplerState(&smpDesc, &m_pSamplerState.p)))
+		return false;
+
+	return true;
+}
+
+void DXGraphicAPI::CDxGraphic::ReleaseComPtr()
 {
 	pixelshader.Release();
 	geometryshader.Release();
@@ -211,17 +234,22 @@ void CDxGraphic::ReleaseComPtr()
 	rtv.Release();
 	backbuffer.Release();
 
+	m_pTexrure.Release();
+	m_pTextureView.Release();
+	m_pSamplerState.Release();
+
 	swapchain.Release();
 	context.Release();
 	device.Release();
 }
 
-void CDxGraphic::SetWindowHandle(HWND hWnd)
+
+void DXGraphicAPI::CDxGraphic::SetWindowHandle(HWND hWnd)
 {
 	m_WindowHandle = hWnd;
 }
 
-bool CDxGraphic::InitD3D(int w, int h)
+bool DXGraphicAPI::CDxGraphic::InitD3D(int w, int h)
 {
 	if (w == 0 || h == 0)
 		return false;
@@ -255,6 +283,12 @@ bool CDxGraphic::InitD3D(int w, int h)
 		ReleaseComPtr();
 		return false;
 	}
+	
+	if (!CreateTextureResource())
+	{
+		ReleaseComPtr();
+		return false;
+	}
 
 	// レンダーターゲットに深度/ステンシルテクスチャを設定
 	context->OMSetRenderTargets(1, &rtv.p, dsv);
@@ -280,7 +314,7 @@ bool CDxGraphic::InitD3D(int w, int h)
 	return true;
 }
 
-void CDxGraphic::Render()
+void DXGraphicAPI::CDxGraphic::Render()
 {
 	UINT strides = sizeof(CoordColor);
 	UINT offset = 0;
@@ -315,46 +349,49 @@ void CDxGraphic::Render()
 	context->VSSetConstantBuffers(0, 1, &matrixbuffer.p);
 	context->GSSetConstantBuffers(0, 1, &matrixbuffer.p);
 
+	context->PSSetShaderResources(0, 1, &m_pTextureView.p);
+	context->PSSetSamplers(0, 1, &m_pSamplerState.p);
 
 	// 深度・ステンシルバッファの使用方法を設定
 	context->OMSetDepthStencilState(dss, 0);
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context->IASetVertexBuffers(0, 1, &vertexbuffer.p, &strides, &offset);
-	context->Draw(numindices, 0);
+	context->IASetIndexBuffer(indexbuffer, DXGI_FORMAT_R32_UINT, 0);
+	context->DrawIndexed(numindices, 0, 0);
 
 	// 作成したプリミティブをウィンドウへ描画
 	if (swapchain != nullptr)
 		swapchain->Present(0, 0);
 }
 
-void CDxGraphic::LoadSampleData(int w, int h)
+void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 {
 	float nearz = 1 / 1000.0f;
-	float farz = 10.0f;
+	float farz = 100.0f;
 
-	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(M_PI / 4.0f, 1.0f * w / h, nearz, farz);
+	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>(M_PI / 4.0f), 1.0f * w / h, nearz, farz);
 
-	DirectX::XMVECTOR eye = DirectX::XMVectorSet(0.0f, -5.0f, 0.57735f, 0.0f);
-	DirectX::XMVECTOR focus = DirectX::XMVectorSet(0.0f, 0.0f, 0.57735f, 0.0f);
-	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	float upsetz = m_camupset ? -1.0f : 1.0f;
+
+	DirectX::XMVECTOR eye = DirectX::XMVectorSet(m_cameraposition.x, m_cameraposition.y, m_cameraposition.z, 0.0f);
+	DirectX::XMVECTOR focus = DirectX::XMVectorSet(m_lookatpoint.x, m_lookatpoint.y, m_lookatpoint.z, 0.0f);
+	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, upsetz, 0.0f);
 
 	d3dviewmatrix = DirectX::XMMatrixLookAtRH(eye, focus, up);
 
 	std::vector<float> vertexarray;
 	for (const Vertex& v : InputData)
 	{
-		vertexarray.push_back(v.position[0]);
-		vertexarray.push_back(v.position[1]);
-		vertexarray.push_back(v.position[2]);
+		vertexarray.push_back(v.pos.x);
+		vertexarray.push_back(v.pos.y);
+		vertexarray.push_back(v.pos.z);
+		vertexarray.push_back(v.texture[0]);
+		vertexarray.push_back(v.texture[1]);
 
-		vertexarray.push_back(v.color[0]);
-		vertexarray.push_back(v.color[1]);
-		vertexarray.push_back(v.color[2]);
-		vertexarray.push_back(v.color[3]);
 	}
 
-	numindices = static_cast<UINT>(vertexarray.size()) / 7;
+	numindices = static_cast<UINT>(indices.size());
 
 	vertexbuffer.Release();
 	D3D11_BUFFER_DESC bdvertex =
@@ -366,20 +403,30 @@ void CDxGraphic::LoadSampleData(int w, int h)
 	D3D11_SUBRESOURCE_DATA srdv = { &vertexarray.front() };
 	device->CreateBuffer(&bdvertex, &srdv, &vertexbuffer.p);
 
+	indexbuffer.Release();
+	D3D11_BUFFER_DESC bdindex =
+	{
+		static_cast<UINT>(sizeof(int) * indices.size()),
+		D3D11_USAGE_DEFAULT,
+		D3D11_BIND_INDEX_BUFFER
+	};
+	D3D11_SUBRESOURCE_DATA srdind = { &indices.front() };
+	device->CreateBuffer(&bdindex, &srdind, &indexbuffer.p);
+
 	Render();
 }
 
-void CDxGraphic::UpdateMatrices(int w, int h)
+void DXGraphicAPI::CDxGraphic::UpdateMatrices(int w, int h)
 {
 	if (w == 0 || h == 0) return;
 
 	float nearz = 1 / 1000.0f;
-	float farz = 10.0f;
+	float farz = 100.0f;
 
 	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>((M_PI / 4)), 1.0f * w / h, nearz, farz);
 }
 
-bool CDxGraphic::ResizeView(int w, int h)
+bool DXGraphicAPI::CDxGraphic::ResizeView(int w, int h)
 {
 	if (w == 0 || h == 0 || device == nullptr)
 		return false;
@@ -418,4 +465,18 @@ bool CDxGraphic::ResizeView(int w, int h)
 	context->RSSetViewports(1, vp);
 
 	return true;
+}
+
+void DXGraphicAPI::CDxGraphic::CameraRotateZ(float delta)
+{
+	DirectX::XMMATRIX rotZ = DirectX::XMMatrixRotationZ(delta);
+	DirectX::XMVECTOR eye = DirectX::XMVectorSet(m_cameraposition.x, m_cameraposition.y, m_cameraposition.z, 0.0f);
+
+	eye = DirectX::XMVector3Transform(eye, rotZ);
+	m_cameraposition = Math::Vector3(DirectX::XMVectorGetX(eye), DirectX::XMVectorGetY(eye), DirectX::XMVectorGetZ(eye));
+	float upsetz = m_camupset ? -1.0f : 1.0f;
+	DirectX::XMVECTOR focus = DirectX::XMVectorSet(m_lookatpoint.x, m_lookatpoint.y, m_lookatpoint.z, 0.0f);
+	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, upsetz, 0.0f);
+
+	d3dviewmatrix = DirectX::XMMatrixLookAtRH(eye, focus, up);
 }

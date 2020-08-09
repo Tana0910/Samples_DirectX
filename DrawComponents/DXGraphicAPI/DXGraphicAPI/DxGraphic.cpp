@@ -348,7 +348,7 @@ void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 	d3dviewmatrix = DirectX::XMMatrixLookAtRH(eye, focus, up);
 
 	std::vector<float> vertexarray;
-	for (Vertex v : InputData)
+	for (const Vertex& v : InputData)
 	{
 		vertexarray.push_back(v.position[0]);
 		vertexarray.push_back(v.position[1]);
@@ -362,7 +362,7 @@ void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 
 
 	std::vector<int> indexarray;
-	for (Triangle tri : InputTriangle)
+	for (const Triangle& tri : InputTriangle)
 	{
 		indexarray.push_back(tri.indices[0]);
 		indexarray.push_back(tri.indices[1]);

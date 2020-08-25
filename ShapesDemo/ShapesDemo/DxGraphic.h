@@ -18,6 +18,9 @@
 // Comptr
 #include <atlcomcli.h>
 
+// DirectXTK
+#include <GeometricPrimitive.h>
+
 class CDxGraphic
 {
 private:
@@ -53,6 +56,9 @@ private:
 	DirectX::XMMATRIX d3dworldmatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX d3dviewmatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX d3dprojmatrix = DirectX::XMMatrixIdentity();
+
+	std::unique_ptr<DirectX::GeometricPrimitive> geomprimitive;
+
 
 	struct Vertex
 	{

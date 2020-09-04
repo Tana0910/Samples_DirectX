@@ -47,17 +47,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    // メイン メッセージ ループ:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    // デッドタイムによる無限ループ
+    // PeekMessage
+    while (TRUE)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
+            if (msg.message == WM_QUIT)
+                break;
+
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
+        else
+        {
+            RotateZ(-(3.14159265f) / (180.0f * 180.0f));
+        }
     }
-
     return (int) msg.wParam;
 }
 
@@ -145,12 +151,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_SIZE:
         ResizeView(w, h);
-        break;
-    case WM_MOUSEMOVE:
-        if (g_dxInitialized)
-        {
-            RotateZ(-(3.14159265f) / 180.0f);
-        }
         break;
     case WM_COMMAND:
         {

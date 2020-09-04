@@ -46,12 +46,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
     // メイン メッセージ ループ:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (TRUE)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
+            if (msg.message == WM_QUIT)
+                break;
+
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+        }
+        else
+        {
+            g_dxgra.CameraRotateZ(-(3.14159265f) / (180.0f * 180.0f));
+            g_dxgra.Render();
         }
     }
 
@@ -147,13 +155,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (g_dxgra.ResizeView(w, h))
         {
             g_dxgra.UpdateMatrices(w, h);
-            g_dxgra.Render();
-        }
-        break;
-    case WM_MOUSEMOVE:
-        if (::GetKeyState(VK_LBUTTON) < 0)
-        {
-            g_dxgra.CameraRotateZ(-(3.14159265f) / 180.0f);
             g_dxgra.Render();
         }
         break;

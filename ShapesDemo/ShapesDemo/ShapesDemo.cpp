@@ -100,7 +100,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // グローバル変数にインスタンス ハンドルを格納する
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      CW_USEDEFAULT, 0, 600, 600, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {

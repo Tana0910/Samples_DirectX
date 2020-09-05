@@ -57,7 +57,7 @@ bool CDxGraphic::CreateDefaultRasterizerState()
 {
 	D3D11_RASTERIZER_DESC desc =
 	{
-		D3D11_FILL_SOLID, D3D11_CULL_BACK, TRUE, 0,	0.0f, 0.0f,
+		D3D11_FILL_SOLID, D3D11_CULL_NONE, TRUE, 0,	0.0f, 0.0f,
 		TRUE, FALSE, FALSE, FALSE
 	};
 	if (FAILED(device->CreateRasterizerState(&desc, &rs))) return false;
@@ -282,13 +282,13 @@ bool CDxGraphic::InitD3D(int w, int h)
 
 void CDxGraphic::Render()
 {
-	UINT strides = sizeof(CoordColor);
-	UINT offset = 0;
+	//UINT strides = sizeof(CoordColor);
+	//UINT offset = 0;
 
 	if (context == nullptr) return;
 
 	// バックバッファと深度バッファのクリア
-	FLOAT backcolor[4] = { 1.f, 1.f, 1.f, 1.f };
+	FLOAT backcolor[4] = { 0.2f, 0.2f, 0.4f, 1.f };
 	context->ClearRenderTargetView(rtv, backcolor);
 	context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -305,9 +305,9 @@ void CDxGraphic::Render()
 
 	MatrixBuffer matrixbuf = {
 		// シェーダーでは列優先(column_major)で行列データを保持するため, 転置を行う
-		DirectX::XMMatrixTranspose(d3dprojmatrix),
-		DirectX::XMMatrixTranspose(d3dviewmatrix),
-		DirectX::XMMatrixTranspose(d3dworldmatrix)
+		DirectX::XMMatrixTranspose(m_proj),
+		DirectX::XMMatrixTranspose(m_view),
+		DirectX::XMMatrixTranspose(m_world)
 	};
 
 	// マトリックスバッファの設定
@@ -319,9 +319,11 @@ void CDxGraphic::Render()
 	// 深度・ステンシルバッファの使用方法を設定
 	context->OMSetDepthStencilState(dss, 0);
 
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	context->IASetVertexBuffers(0, 1, &vertexbuffer.p, &strides, &offset);
-	context->Draw(numindices, 0);
+	//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//context->IASetVertexBuffers(0, 1, &vertexbuffer.p, &strides, &offset);
+	//context->Draw(numindices, 0);
+
+	m_shape->Draw(m_world, m_view, m_proj);
 
 	// 作成したプリミティブをウィンドウへ描画
 	if (swapchain != nullptr)
@@ -330,41 +332,56 @@ void CDxGraphic::Render()
 
 void CDxGraphic::LoadSampleData(int w, int h)
 {
-	float nearz = 1 / 1000.0f;
-	float farz = 10.0f;
+	constexpr float nearz = 1 / 1000.0f;
+	constexpr float farz = 10.0f;
 
-	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(M_PI / 4.0f, 1.0f * w / h, nearz, farz);
+	m_shape = DirectX::GeometricPrimitive::CreateSphere(context.p);
 
-	DirectX::XMVECTOR eye = DirectX::XMVectorSet(0.0f, -5.0f, 0.57735f, 0.0f);
-	DirectX::XMVECTOR focus = DirectX::XMVectorSet(0.0f, 0.0f, 0.57735f, 0.0f);
-	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	m_view = DirectX::SimpleMath::Matrix::CreateLookAt(
+		DirectX::SimpleMath::Vector3(2.0f, 2.0f, 2.0f),
+		DirectX::SimpleMath::Vector3(0.0f, 0.0f, 0.0f),
+		DirectX::SimpleMath::Vector3::UnitZ
+	);
 
-	d3dviewmatrix = DirectX::XMMatrixLookAtRH(eye, focus, up);
+	m_proj = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(
+		DirectX::XM_PI / 4.0f,
+		static_cast<float>(1.0f * w) / static_cast<float>(h),
+		nearz,
+		farz
+	);
 
-	std::vector<float> vertexarray;
-	for (const Vertex& v : InputData)
-	{
-		vertexarray.push_back(v.position[0]);
-		vertexarray.push_back(v.position[1]);
-		vertexarray.push_back(v.position[2]);
+	//d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(M_PI / 4.0f, 1.0f * w / h, nearz, farz);
 
-		vertexarray.push_back(v.color[0]);
-		vertexarray.push_back(v.color[1]);
-		vertexarray.push_back(v.color[2]);
-		vertexarray.push_back(v.color[3]);
-	}
+	//DirectX::XMVECTOR eye = DirectX::XMVectorSet(0.0f, -5.0f, 0.57735f, 0.0f);
+	//DirectX::XMVECTOR focus = DirectX::XMVectorSet(0.0f, 0.0f, 0.57735f, 0.0f);
+	//DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
-	numindices = static_cast<UINT>(vertexarray.size()) / 7;
+	//d3dviewmatrix = DirectX::XMMatrixLookAtRH(eye, focus, up);
 
-	vertexbuffer.Release();
-	D3D11_BUFFER_DESC bdvertex =
-	{
-		static_cast<UINT>(sizeof(float) * vertexarray.size()),
-		D3D11_USAGE_DEFAULT,
-		D3D11_BIND_VERTEX_BUFFER
-	};
-	D3D11_SUBRESOURCE_DATA srdv = { &vertexarray.front() };
-	device->CreateBuffer(&bdvertex, &srdv, &vertexbuffer.p);
+	//std::vector<float> vertexarray;
+	//for (const Vertex& v : InputData)
+	//{
+	//	vertexarray.push_back(v.position[0]);
+	//	vertexarray.push_back(v.position[1]);
+	//	vertexarray.push_back(v.position[2]);
+
+	//	vertexarray.push_back(v.color[0]);
+	//	vertexarray.push_back(v.color[1]);
+	//	vertexarray.push_back(v.color[2]);
+	//	vertexarray.push_back(v.color[3]);
+	//}
+
+	//numindices = static_cast<UINT>(vertexarray.size()) / 7;
+
+	//vertexbuffer.Release();
+	//D3D11_BUFFER_DESC bdvertex =
+	//{
+	//	static_cast<UINT>(sizeof(float) * vertexarray.size()),
+	//	D3D11_USAGE_DEFAULT,
+	//	D3D11_BIND_VERTEX_BUFFER
+	//};
+	//D3D11_SUBRESOURCE_DATA srdv = { &vertexarray.front() };
+	//device->CreateBuffer(&bdvertex, &srdv, &vertexbuffer.p);
 
 	Render();
 }
@@ -375,8 +392,13 @@ void CDxGraphic::UpdateMatrices(int w, int h)
 
 	float nearz = 1 / 1000.0f;
 	float farz = 10.0f;
-
-	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>((M_PI / 4)), 1.0f * w / h, nearz, farz);
+	m_proj = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(
+		DirectX::XM_PI / 4.0f,
+		static_cast<float>(w) / static_cast<float>(h),
+		nearz,
+		farz
+	);
+	//d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>((M_PI / 4)), 1.0f * w / h, nearz, farz);
 }
 
 bool CDxGraphic::ResizeView(int w, int h)

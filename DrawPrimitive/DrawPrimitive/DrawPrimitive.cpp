@@ -112,7 +112,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_dxgra.SetWindowHandle(hWnd);
    RECT rc;
-   GetWindowRect(hWnd, &rc);
+   GetClientRect(hWnd, &rc);
    int w = rc.right - rc.left;
    int h = rc.bottom - rc.top;
    if (g_dxgra.InitD3D(w, h))
@@ -136,7 +136,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	RECT rc;
-	GetWindowRect(hWnd, &rc);
+	GetClientRect(hWnd, &rc);
 	int w = rc.right - rc.left;
 	int h = rc.bottom - rc.top;
     switch (message)

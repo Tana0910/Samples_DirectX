@@ -1,11 +1,17 @@
 #pragma once
 // M_PI
-#define _USE_MATH_DEFINES
-#include <math.h>
+//#define _USE_MATH_DEFINES
+//#include <math.h>
 #include <vector>
 #include <fstream>
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
+
+// C++17
+#include <filesystem>
+
+// C++20
+#include <numbers>
 
 // D3D
 #include <d3d11.h>

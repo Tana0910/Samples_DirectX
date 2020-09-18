@@ -1,5 +1,6 @@
 ﻿// ViewTestWin32.cpp : アプリケーションのエントリ ポイントを定義します。
 //
+#include <numbers>
 #include "framework.h"
 #include "ViewTestWin32.h"
 #include "..\\..\\DXGraphicAPI\\DXGraphicAPI\\APIFuncs.h"
@@ -61,7 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            RotateZ(-(3.14159265f) / (180.0f * 180.0f));
+            RotateZ(-std::numbers::pi_v<float> / (180.0f * 180.0f));
         }
     }
     return (int) msg.wParam;

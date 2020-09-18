@@ -57,8 +57,16 @@ bool DXGraphicAPI::CDxGraphic::CreateDefaultRasterizerState()
 {
 	D3D11_RASTERIZER_DESC desc =
 	{
-		D3D11_FILL_SOLID, D3D11_CULL_BACK, TRUE, 0,	0.0f, 0.0f,
-		TRUE, FALSE, FALSE, FALSE
+		.FillMode = D3D11_FILL_SOLID,
+		.CullMode = D3D11_CULL_BACK,
+		.FrontCounterClockwise = TRUE,
+		.DepthBias = 0,
+		.DepthBiasClamp = 0.0f,
+		.SlopeScaledDepthBias = 0.0f,
+		.DepthClipEnable = TRUE,
+		.ScissorEnable = FALSE,
+		.MultisampleEnable = FALSE, 
+		.AntialiasedLineEnable = FALSE
 	};
 	if (FAILED(device->CreateRasterizerState(&desc, &rs))) return false;
 
@@ -334,7 +342,7 @@ void DXGraphicAPI::CDxGraphic::LoadSampleData(int w, int h)
 	float nearz = 1 / 1000.0f;
 	float farz = 10.0f;
 
-	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(M_PI / 4.0f, 1.0f * w / h, nearz, farz);
+	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH( std::numbers::pi_v<float> / 4.0f, 1.0f * w / h, nearz, farz);
 
 	m_cameraposition = Math::Vector3(3.5f, 3.5f, 3.5f);
 	m_lookatpoint = Math::Vector3(0.0f, 0.0f, 0.0f);
@@ -400,7 +408,7 @@ void DXGraphicAPI::CDxGraphic::UpdateMatrices(int w, int h)
 	float nearz = 1 / 1000.0f;
 	float farz = 10.0f;
 
-	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(static_cast<float>((M_PI / 4)), 1.0f * w / h, nearz, farz);
+	d3dprojmatrix = DirectX::XMMatrixPerspectiveFovRH(std::numbers::pi_v<float> / 4.0f, 1.0f * w / h, nearz, farz);
 }
 
 bool DXGraphicAPI::CDxGraphic::ResizeView(int w, int h)
